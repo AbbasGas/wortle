@@ -1,0 +1,140 @@
+@import url(reset.css);
+@import url(variables.css);
+
+:root {
+	--cell-size: 2em;
+	--col-lost: #f54;
+	--col-cell-empty: #fff;
+	--col-cell-incorrect: #999;
+	--col-cell-almost: #ff6;
+	--col-cell-correct: #6f9;
+}
+
+body {
+	font-family: sans-serif;
+	background-color: var(--col-bg);
+	font-size: 2em;
+	color: var(--col-text);
+	text-align: center;
+	padding: 1em 0;
+}
+
+h1 {
+	font-size: 1.5em;
+}
+
+h1,
+cell {
+	font-family: serif;
+}
+
+main {
+	margin: 1em auto;
+	display: flex;
+	flex-direction: column;
+}
+
+row {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
+
+cell {
+	user-select: none;
+	display: block;
+	width: var(--cell-size);
+	height: var(--cell-size);
+	line-height: var(--cell-size);
+	background-color: white;
+	margin: 0.2em;
+	box-shadow: var(--shadow-1);
+	border: 2px solid var(--col-cell-empty);
+	opacity: 0.5;
+	transition: box-shadow var(--time-transition),
+		border-color var(--time-transition), opacity var(--time-transition);
+}
+
+cell[enabled='true'] {
+	cursor: text;
+	opacity: 1;
+}
+
+cell[enabled='true']:hover {
+	box-shadow: var(--shadow-2);
+}
+
+cell[selected='true'] {
+	border-color: var(--col-primary);
+}
+
+cell[value='0'] {
+	background-color: var(--col-cell-incorrect);
+	border-color: var(--col-cell-incorrect);
+}
+
+cell[value='1'] {
+	background-color: var(--col-cell-almost);
+	border-color: var(--col-cell-almost);
+}
+
+cell[value='2'] {
+	background-color: var(--col-cell-correct);
+	border-color: var(--col-cell-correct);
+}
+
+btn {
+	font-size: 0.8em;
+	display: inline-block;
+	padding: 0.6em 1em;
+	background-color: var(--col-primary);
+	color: white;
+	box-shadow: var(--shadow-1);
+	border: none;
+	cursor: pointer;
+	transition: box-shadow 0.3s, background-color 0.3s;
+	user-select: none;
+}
+
+btn:hover {
+	background-color: var(--col-primary-light);
+	box-shadow: var(--shadow-2);
+}
+
+keyboard {
+	background: var(--col-text-light);
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	margin: 1em auto 0 auto;
+	width: 50%;
+	min-width: 450px;
+	max-width: 600px;
+}
+
+char {
+	font-size: 0.8em;
+	display: inline-block;
+	width: 1em;
+	height: 1em;
+	background: var(--col-cell-empty);
+	padding: 0.1em;
+	margin: 0.2em;
+}
+
+char[checked='true'] {
+	background: var(--col-cell-incorrect);
+}
+
+#message {
+	margin: 1em auto;
+	font-size: 0.8em;
+}
+
+#message.won {
+	color: var(--col-cell-correct);
+}
+
+#message.lost {
+	color: var(--col-lost);
+}
