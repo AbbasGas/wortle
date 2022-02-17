@@ -120,6 +120,7 @@ char {
 	background: var(--col-cell-empty);
 	padding: 0.1em;
 	margin: 0.2em;
+	user-select: none;
 }
 
 char[checked='true'] {
@@ -127,14 +128,16 @@ char[checked='true'] {
 }
 
 #message {
+	display: inline-block;
+	padding: 0.5em 1em;
 	margin: 1em auto;
 	font-size: 0.8em;
 }
 
 #message.won {
-	color: var(--col-cell-correct);
+	background-color: var(--col-cell-correct);
 }
 
 #message.lost {
-	color: var(--col-lost);
+	background-color: var(--col-lost);
 }

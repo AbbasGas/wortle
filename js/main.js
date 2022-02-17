@@ -16,7 +16,7 @@ const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 // determines how many tries per word relative to word length
 // e.g. with a 5 letter word, AMOUNT_TRIES = 2 would mean 10 tries
-const AMOUNT_TRIES = 1
+const AMOUNT_TRIES = 1.5
 
 // list of words
 let wordlist
@@ -193,7 +193,7 @@ document.addEventListener('keydown', event => {
                 gameover = true
 
                 // set status message
-                UI.message.textContent = UI.messages.idle.replace('%s', word)
+                UI.message.textContent = UI.messages.lost.replace('%s', word)
                 UI.message.className = 'lost'
             } else {
                 // move to next row
