@@ -53,12 +53,12 @@ async function setup() {
 }
 
 // reset the round
-function reset() {
+function reset(given_word) {
     // reset game state
     gameover = false
 
     // pick random word
-    word = random_word()
+    word = given_word || random_word()
 
     // set status message
     UI.message.textContent = UI.messages.idle
