@@ -2,7 +2,7 @@
 @import url(variables.css);
 
 :root {
-	--cell-size: 2em;
+	--cell-size: 1.2em;
 	--col-lost: #f54;
 	--col-cell-empty: #fff;
 	--col-cell-incorrect: #999;
@@ -47,7 +47,7 @@ cell {
 	height: var(--cell-size);
 	line-height: var(--cell-size);
 	background-color: white;
-	margin: 0.2em;
+	margin: 0.1em;
 	box-shadow: var(--shadow-1);
 	border: 2px solid var(--col-cell-empty);
 	opacity: 0.5;
@@ -84,9 +84,9 @@ cell[value='2'] {
 }
 
 btn {
-	font-size: 0.8em;
+	font-size: 0.6em;
 	display: inline-block;
-	padding: 0.6em 1em;
+	padding: 0.4em 1em;
 	background-color: var(--col-primary);
 	color: white;
 	box-shadow: var(--shadow-1);
@@ -106,14 +106,14 @@ keyboard {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
-	margin: 1em auto 0 auto;
+	margin: 0.2em auto 0 auto;
 	width: 50%;
-	min-width: 450px;
-	max-width: 600px;
+	min-width: 200px;
+	max-width: 400px;
 }
 
 char {
-	font-size: 0.8em;
+	font-size: 0.6em;
 	display: inline-block;
 	width: 1em;
 	height: 1em;
@@ -121,6 +121,7 @@ char {
 	padding: 0.1em;
 	margin: 0.2em;
 	user-select: none;
+	font-weight: 900;
 }
 
 char[checked='true'] {
@@ -130,7 +131,7 @@ char[checked='true'] {
 #message {
 	display: inline-block;
 	padding: 0.5em 1em;
-	margin: 1em auto;
+	margin: 0.5em auto 0 auto;
 	font-size: 0.8em;
 }
 
