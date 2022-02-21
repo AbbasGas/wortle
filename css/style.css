@@ -55,6 +55,10 @@ cell {
 		border-color var(--time-transition), opacity var(--time-transition);
 }
 
+cell[enabled='true'].error {
+	border-color: var(--col-lost);
+}
+
 cell[enabled='true'] {
 	cursor: text;
 	opacity: 1;

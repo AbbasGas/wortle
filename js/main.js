@@ -58,7 +58,7 @@ function reset(given_word) {
     gameover = false
 
     // pick random word
-    word = given_word || random_word()
+    word = given_word?.toUpperCase() || random_word()
 
     // set status message
     UI.message.textContent = UI.messages.idle
@@ -160,89 +160,112 @@ document.addEventListener('keydown', event => {
             cell_selection = UI.cells[selection.y][selection.x + 1]
             cell_selection.setAttribute('selected', 'true')
         }
-    } else if (event.key === 'Enter') {
-        // submit row
-        if (UI.cells[selection.y].filter(cell => cell.textContent.length > 0).length == UI.cells[selection.y].length) {
-            // deselect cell
-            cell_selection.setAttribute('selected', 'false')
-
-            // get string of current guess
-            let guess = get_text(selection.y)
-
-            // set checked on all guessed characters
-            guess.split('').forEach(char =>
-                document.querySelectorAll('keyboard char[checked="false"]').forEach(el_char => {
-                    if (el_char.textContent === char) el_char.setAttribute('checked', 'true')
-                })
-            )
-
-            // check if won
-            if (guess === word) {
-                // game won
-                cell_selection.setAttribute('selected', 'false')
-                cell_selection = null
-                gameover = true
-
-                // set status message
-                UI.message.textContent = UI.messages.won.replace('%i', selection.y + 1)
-                UI.message.className = 'won'
-            } else if (selection.y == guesses - 1) {
-                // game lost
-                cell_selection.setAttribute('selected', 'false')
-                cell_selection = null
-                gameover = true
-
-                // set status message
-                UI.message.textContent = UI.messages.lost.replace('%s', word)
-                UI.message.className = 'lost'
-            } else {
-                // move to next row
-                UI.cells[selection.y].forEach(cell => cell.setAttribute('enabled', 'false'))
-                UI.cells[selection.y + 1].forEach(cell => cell.setAttribute('enabled', 'true'))
-                cell_selection = UI.cells[selection.y + 1][0]
-                cell_selection.setAttribute('selected', 'true')
-            }
-
-            // highlight previous row
-            // copy of the word to keep track of letters that have been flagged
-            // consider following scenario: word = "monkey", guess = "doodle"
-            // the first letter o is valid, the second shouldn't be flagged as "wrong position"
-            // since the o only appears once.
-            // this trackkeeping helps with that, as every "taken" letter gets replaced by a "-" 
-            let word_checklist = word
-            for (let i = 0; i < word.length; i++) {
-                let char_original = word_checklist.charAt(i)
-                let char_guess = guess.charAt(i)
-
-                if (char_guess == char_original) {
-                    // char is correct
-                    UI.cells[selection.y][i].setAttribute('value', '2')
-
-                    // flag char in word_checklist as taken (replace with -)
-                    let index = [...word_checklist].findIndex(char => char === char_guess)
-                    word_checklist = [...word_checklist]
-                    word_checklist[index] = '-'
-                    word_checklist = word_checklist.join('')
-                } else if (word_checklist.includes(char_guess)) {
-                    // char in word, wrong position
-                    UI.cells[selection.y][i].setAttribute('value', '1')
-
-                    // flag char in word_checklist as taken (replace with -)
-                    let index = [...word_checklist].findIndex(char => char === char_guess)
-                    word_checklist = [...word_checklist]
-                    word_checklist[index] = '-'
-                    word_checklist = word_checklist.join('')
-                } else {
-                    // char not in word or in word, wrong position and taken
-                    UI.cells[selection.y][i].setAttribute('value', '0')
-                }
-            }
-        } else {
-            // show missing chars error
-
-        }
-    }
+    } else if (event.key === 'Enter') submit_row()
 })
+
+// submit the guess
+function submit_row() {
+    // current cell selection x and y coordinates
+    let selection = {
+        x: parseInt(cell_selection.getAttribute('x')),
+        y: parseInt(cell_selection.getAttribute('y'))
+    }
+
+    if (UI.cells[selection.y].filter(cell => cell.textContent.length > 0).length == UI.cells[selection.y].length) {
+        // deselect cell
+        cell_selection.setAttribute('selected', 'false')
+
+        // get string of current guess
+        let guess = get_text(selection.y)
+
+        // set checked on all guessed characters
+        guess.split('').forEach(char =>
+            document.querySelectorAll('keyboard char[checked="false"]').forEach(el_char => {
+                if (el_char.textContent === char) el_char.setAttribute('checked', 'true')
+            })
+        )
+
+        // check if won
+        if (guess === word) {
+            // game won
+            cell_selection.setAttribute('selected', 'false')
+            cell_selection = null
+            gameover = true
+
+            // set status message
+            UI.message.textContent = UI.messages.won.replace('%i', selection.y + 1)
+            UI.message.className = 'won'
+        } else if (selection.y == guesses - 1) {
+            // game lost
+            cell_selection.setAttribute('selected', 'false')
+            cell_selection = null
+            gameover = true
+
+            // set status message
+            UI.message.textContent = UI.messages.lost.replace('%s', word)
+            UI.message.className = 'lost'
+        } else {
+            // move to next row
+            UI.cells[selection.y].forEach(cell => cell.setAttribute('enabled', 'false'))
+            UI.cells[selection.y + 1].forEach(cell => cell.setAttribute('enabled', 'true'))
+            cell_selection = UI.cells[selection.y + 1][0]
+            cell_selection.setAttribute('selected', 'true')
+        }
+
+        // highlight previous row
+        // copy of the word to keep track of letters that have been flagged
+        // consider following scenario: word = "monkey", guess = "doodle"
+        // the first letter o is valid, the second shouldn't be flagged as "wrong position"
+        // since the o only appears once.
+        // this trackkeeping helps with that, as every "taken" letter gets replaced by a "-" 
+        let word_checklist = word
+
+        // first pass, mark all as invalid
+        UI.cells[selection.y].forEach(cell => {
+            if (!cell.getAttribute('value')) cell.setAttribute('value', 0)
+        })
+
+        // second pass, mark correct letters
+        for (let i = 0; i < word.length; i++) {
+            let char_original = word_checklist.charAt(i)
+            let char_guess = guess.charAt(i)
+
+            if (char_guess == char_original) {
+                // char is correct
+                UI.cells[selection.y][i].setAttribute('value', '2')
+
+                // flag char in word_checklist as taken (replace with -)
+                let index = word_checklist.split('').findIndex(char => char === char_guess)
+                word_checklist = word_checklist.split('')
+                word_checklist[index] = '-'
+                word_checklist = word_checklist.join('')
+            }
+        }
+
+        // third pass, highlight all non-included
+        for (let i = 0; i < word.length; i++) {
+            let char_original = word_checklist.charAt(i)
+            let char_guess = guess.charAt(i)
+
+            if (char_original != '-' && word_checklist.includes(char_guess)) {
+                // char in word, wrong position
+                UI.cells[selection.y][i].setAttribute('value', '1')
+
+                // flag char in word_checklist as taken (replace with -)
+                let index = [...word_checklist].findIndex(char => char === char_guess)
+                word_checklist = [...word_checklist]
+                word_checklist[index] = '-'
+                word_checklist = word_checklist.join('')
+            }
+        }
+    } else {
+        // show missing chars error
+        UI.cells[selection.y].filter(cell => cell.textContent === '').forEach(cell => {
+            cell.classList.add('error')
+            setTimeout(() => cell.classList.remove('error'), 500)
+        })
+    }
+}
 
 // get string from row
 function get_text(y) {
@@ -262,4 +285,5 @@ function random_word() {
 // reset button
 document.querySelector('#reset').addEventListener('click', () => reset())
 
+// start
 setup()
