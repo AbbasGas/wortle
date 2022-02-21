@@ -260,6 +260,6 @@ function random_word() {
 }
 
 // reset button
-document.querySelector('#reset').addEventListener('click', reset)
+document.querySelector('#reset').addEventListener('click', () => reset())
 
 setup()
