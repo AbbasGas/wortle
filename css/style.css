@@ -8,6 +8,7 @@
 	--col-cell-incorrect: #999;
 	--col-cell-almost: #ff6;
 	--col-cell-correct: #6f9;
+	--colorblind-dot-size: 30%;
 }
 
 body {
@@ -106,14 +107,15 @@ btn:hover {
 }
 
 keyboard {
-	background: var(--col-text-light);
+	background: rgba(0, 0, 0, 0.05);
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
-	margin: 0.2em auto 0 auto;
+	margin: 0.5em auto 0 auto;
 	width: 50%;
 	min-width: 200px;
 	max-width: 400px;
+	box-shadow: var(--shadow-1);
 }
 
 char {
@@ -129,15 +131,36 @@ char {
 }
 
 char[value='0'] {
-	background: var(--col-cell-incorrect);
+	background-color: var(--col-cell-incorrect);
 }
 
 char[value='1'] {
-	background: var(--col-cell-almost);
+	background-color: var(--col-cell-almost);
 }
 
 char[value='2'] {
-	background: var(--col-cell-correct);
+	background-color: var(--col-cell-correct);
+}
+
+cell[value='1'],
+cell[value='2'],
+char[value='1'],
+char[value='2'] {
+	background-image: url(/svg/circle.svg);
+	background-size: var(--colorblind-dot-size);
+	background-repeat: no-repeat;
+}
+
+cell[value='1'],
+char[value='1'] {
+	background-position: calc(100% + (var(--colorblind-dot-size) / 2))
+		calc(0% - (var(--colorblind-dot-size) / 2));
+}
+
+cell[value='2'],
+char[value='2'] {
+	background-position: calc(0% - (var(--colorblind-dot-size) / 2))
+		calc(0% - (var(--colorblind-dot-size) / 2));
 }
 
 message {
@@ -183,4 +206,29 @@ message.won {
 
 message.lost {
 	background-color: var(--col-lost);
+}
+
+h2 {
+	font-weight: 600;
+	font-size: 0.5em;
+	margin: 1em auto 0 auto;
+}
+
+legend {
+	display: inline-block;
+	box-sizing: border-box;
+	margin: auto;
+	padding: 0.1em 1em;
+	margin-top: 0em;
+	width: auto;
+}
+
+legend span {
+	font-size: 0.5em;
+}
+
+legend > p {
+	display: inline-flex;
+	justify-content: flex-start;
+	align-items: center;
 }
