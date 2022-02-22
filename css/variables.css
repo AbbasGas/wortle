@@ -1,7 +1,7 @@
 :root {
 	--col-bg: hsl(15, 12%, 90%);
 	--col-text: hsla(20, 60%, 5%, 0.87);
-	--col-text-light: hsla(15, 6%, 80%, 0.87);
+	--col-text-light: white;
 	--col-primary: cadetblue;
 	--col-primary-light: hsl(182, 35%, 60%);
 	--col-accent: hsl(303, 28%, 31%);
