@@ -239,15 +239,20 @@ function submit_row() {
                 word_checklist = word_checklist.split('')
                 word_checklist[index] = '-'
                 word_checklist = word_checklist.join('')
+
+                // flag char in guess as checked
+                guess = guess.split('')
+                guess[i] = '-'
+                guess = guess.join('')
             }
         }
 
         // third pass, highlight all non-included
         for (let i = 0; i < word.length; i++) {
-            let char_original = word_checklist.charAt(i)
             let char_guess = guess.charAt(i)
 
-            if (char_original != '-' && word_checklist.includes(char_guess)) {
+            // if char left in word and char not already checked
+            if (word_checklist.includes(char_guess) && char_guess != '-') {
                 // char in word, wrong position
                 UI.cells[selection.y][i].setAttribute('value', '1')
 
