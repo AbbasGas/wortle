@@ -128,21 +128,59 @@ char {
 	font-weight: 900;
 }
 
-char[checked='true'] {
+char[value='0'] {
 	background: var(--col-cell-incorrect);
 }
 
-#message {
-	display: inline-block;
+char[value='1'] {
+	background: var(--col-cell-almost);
+}
+
+char[value='2'] {
+	background: var(--col-cell-correct);
+}
+
+message {
+	color: var(--col-text-light);
+	font-weight: 400;
+	letter-spacing: 0.05em;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	display: block;
 	padding: 0.5em 1em;
 	margin: 0.5em auto 0 auto;
 	font-size: 0.8em;
+	opacity: 0;
+	background-color: transparent;
+	transform: translateY(150%);
+	box-shadow: var(--shadow-2);
+	transition: opacity var(--time-transition),
+		background-color var(--time-transition),
+		transform var(--time-transition), color var(--time-transition);
 }
 
-#message.won {
+message p {
+	display: inline;
+}
+
+message span {
+	display: inline;
+	font-weight: 900;
+}
+
+message.won,
+message.lost {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+message.won {
 	background-color: var(--col-cell-correct);
+	color: var(--col-text);
 }
 
-#message.lost {
+message.lost {
 	background-color: var(--col-lost);
 }

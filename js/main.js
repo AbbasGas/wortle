@@ -2,11 +2,18 @@
 let UI = {
     main: document.querySelector('main'),
     keyboard: document.querySelector('keyboard'),
-    message: document.querySelector('#message'),
+    message: document.querySelector('message'),
+    message_text: document.querySelector('message p'),
+    message_solution: document.querySelector('message span'),
     messages: {
-        idle: 'Viel Glück.',
-        won: 'Gewonnen in %i Versuchen!',
-        lost: 'Verloren. Das Wort war %s.'
+        won: {
+            main: 'Gewonnen in ',
+            span: '%i Versuchen.'
+        },
+        lost: {
+            main: 'Verloren. Lösung: ',
+            span: '%w.'
+        }
     },
     cells: []
 }
@@ -43,7 +50,7 @@ async function setup() {
     // inject character preview
     ALPHABET.split('').forEach(char => {
         let el_char = document.createElement('char')
-        el_char.setAttribute('checked', 'false')
+        el_char.setAttribute('value', '-1')
         el_char.textContent = char
         UI.keyboard.append(el_char)
     })
@@ -61,7 +68,8 @@ function reset(given_word) {
     word = given_word?.toUpperCase() || random_word()
 
     // set status message
-    UI.message.textContent = UI.messages.idle
+    UI.message_text.textContent = ''
+    UI.message_solution.textContent = ''
     UI.message.className = ''
 
     // set amount of guesses based on word length
@@ -113,7 +121,7 @@ function reset(given_word) {
     UI.cells[0][0].setAttribute('selected', 'true')
 
     // reset character preview
-    document.querySelectorAll('keyboard char').forEach(char => char.setAttribute('checked', 'false'))
+    document.querySelectorAll('keyboard char').forEach(char => char.setAttribute('value', '-1'))
 }
 
 // handle arrow and alphabetic keys
@@ -178,13 +186,6 @@ function submit_row() {
         // get string of current guess
         let guess = get_text(selection.y)
 
-        // set checked on all guessed characters
-        guess.split('').forEach(char =>
-            document.querySelectorAll('keyboard char[checked="false"]').forEach(el_char => {
-                if (el_char.textContent === char) el_char.setAttribute('checked', 'true')
-            })
-        )
-
         // check if won
         if (guess === word) {
             // game won
@@ -193,7 +194,8 @@ function submit_row() {
             gameover = true
 
             // set status message
-            UI.message.textContent = UI.messages.won.replace('%i', selection.y + 1)
+            UI.message_text.textContent = UI.messages.won.main
+            UI.message_solution.textContent = UI.messages.won.span.replace('%i', selection.y + 1)
             UI.message.className = 'won'
         } else if (selection.y == guesses - 1) {
             // game lost
@@ -202,7 +204,8 @@ function submit_row() {
             gameover = true
 
             // set status message
-            UI.message.textContent = UI.messages.lost.replace('%s', word)
+            UI.message_text.textContent = UI.messages.lost.main
+            UI.message_solution.textContent = UI.messages.lost.span.replace('%w', word)
             UI.message.className = 'lost'
         } else {
             // move to next row
@@ -263,6 +266,13 @@ function submit_row() {
                 word_checklist = word_checklist.join('')
             }
         }
+
+        // highlight keyboard chars
+        UI.cells[selection.y].forEach(cell =>
+            document.querySelectorAll('keyboard char[value="-1"], keyboard char[value="1"]').forEach(el_char => {
+                if (el_char.textContent === cell.textContent) el_char.setAttribute('value', cell.getAttribute('value'))
+            })
+        )
     } else {
         // show missing chars error
         UI.cells[selection.y].filter(cell => cell.textContent === '').forEach(cell => {
