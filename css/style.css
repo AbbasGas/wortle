@@ -146,7 +146,7 @@ cell[value='1'],
 cell[value='2'],
 char[value='1'],
 char[value='2'] {
-	background-image: url(/svg/circle.svg);
+	background-image: url(../svg/circle.svg);
 	background-size: var(--colorblind-dot-size);
 	background-repeat: no-repeat;
 }
