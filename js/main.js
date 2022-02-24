@@ -25,7 +25,10 @@ const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 // e.g. with a 5 letter word, AMOUNT_TRIES = 2 would mean 10 tries
 const AMOUNT_TRIES = 1.5
 
-// list of words
+// lexicon of german words
+let lexicon
+
+// list of solutions/guessing words
 let wordlist
 
 // current word
@@ -46,6 +49,10 @@ async function setup() {
     let words = await fetch('wordlist.json')
     words = await words.json()
     wordlist = words.words
+
+    // load lexicon
+    let lex = await fetch('lexicon.json')
+    lexicon = await lex.json()
 
     // inject character preview
     ALPHABET.split('').forEach(char => {
@@ -179,12 +186,25 @@ function submit_row() {
         y: parseInt(cell_selection.getAttribute('y'))
     }
 
-    if (UI.cells[selection.y].filter(cell => cell.textContent.length > 0).length == UI.cells[selection.y].length) {
+    // get string of current guess
+    let guess = get_text(selection.y)
+
+    if (UI.cells[selection.y].filter(cell => cell.textContent.length > 0).length != UI.cells[selection.y].length) {
+        // show missing chars error
+        UI.cells[selection.y].filter(cell => cell.textContent === '').forEach(cell => {
+            cell.classList.add('error')
+            setTimeout(() => cell.classList.remove('error'), 500)
+        })
+    } else if (!lexicon.includes(guess)) {
+        // not a real word
+        UI.cells[selection.y].forEach(cell => {
+            cell.classList.add('error')
+            setTimeout(() => cell.classList.remove('error'), 500)
+        })
+    } else {
+        // valid guess
         // deselect cell
         cell_selection.setAttribute('selected', 'false')
-
-        // get string of current guess
-        let guess = get_text(selection.y)
 
         // check if won
         if (guess === word) {
@@ -273,12 +293,6 @@ function submit_row() {
                 if (el_char.textContent === cell.textContent && ['-1', '0', '1'].includes(el_char.getAttribute('value'))) el_char.setAttribute('value', cell.getAttribute('value'))
             })
         )
-    } else {
-        // show missing chars error
-        UI.cells[selection.y].filter(cell => cell.textContent === '').forEach(cell => {
-            cell.classList.add('error')
-            setTimeout(() => cell.classList.remove('error'), 500)
-        })
     }
 }
 
