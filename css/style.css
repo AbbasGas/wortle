@@ -43,7 +43,6 @@ row {
 
 input {
 	text-align: center;
-	user-select: none;
 	display: block;
 	width: var(--cell-size);
 	height: var(--cell-size);
