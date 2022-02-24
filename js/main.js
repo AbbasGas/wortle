@@ -135,7 +135,6 @@ function reset(given_word) {
 // handle arrow and alphabetic keys
 document.addEventListener('keydown', event => {
     if (gameover) return
-    event.preventDefault()
 
     // current cell selection x and y coordinates
     let selection = {
@@ -165,6 +164,8 @@ document.addEventListener('keydown', event => {
         // delete textContent without moving
         cell_selection.value = ''
     } else if (ALPHABET.includes(event.key.toUpperCase()) && cell_selection && cell_selection.disabled == false) {
+        event.preventDefault()
+
         // change text
         cell_selection.value = event.key.toUpperCase()
 
