@@ -95,19 +95,17 @@ function reset(given_word) {
 
         for (let x = 0; x < word.length; x++) {
             // create new cell
-            let cell = document.createElement('cell')
+            let cell = document.createElement('input')
             cell.setAttribute('x', x)
             cell.setAttribute('y', y)
-            cell.setAttribute('selected', 'false')
-            cell.setAttribute('enabled', 'false')
+            cell.disabled = true
+            cell.setAttribute('enabled', false)
 
             // add eventlistener
             cell.addEventListener('click', c => {
-                if (gameover || cell.getAttribute('enabled') == 'false') return
+                if (gameover || cell.getAttribute('disabled') == 'true') return
 
                 // select cell on click
-                if (cell_selection) cell_selection.setAttribute('selected', 'false')
-                cell.setAttribute('selected', 'true')
                 cell_selection = cell
             })
 
@@ -121,11 +119,14 @@ function reset(given_word) {
     }
 
     // enable input on first row
-    UI.cells[0].forEach(row => row.setAttribute('enabled', 'true'))
+    UI.cells[0].forEach(row => {
+        row.setAttribute('enabled', true)
+        row.disabled = false
+    })
 
     // set selected cell to first cell
     cell_selection = UI.cells[0][0]
-    UI.cells[0][0].setAttribute('selected', 'true')
+    UI.cells[0][0].focus()
 
     // reset character preview
     document.querySelectorAll('keyboard char').forEach(char => char.setAttribute('value', '-1'))
@@ -134,6 +135,7 @@ function reset(given_word) {
 // handle arrow and alphabetic keys
 document.addEventListener('keydown', event => {
     if (gameover) return
+    event.preventDefault()
 
     // current cell selection x and y coordinates
     let selection = {
@@ -142,38 +144,34 @@ document.addEventListener('keydown', event => {
     }
 
     // decide action based on key 
-    if (event.key === 'ArrowRight' && selection.x < word.length - 1) {
+    if (['ArrowRight', 'Tab'].includes(event.key) && selection.x < word.length - 1) {
         // move right
-        cell_selection.setAttribute('selected', 'false')
         cell_selection = UI.cells[selection.y][selection.x + 1]
-        cell_selection.setAttribute('selected', 'true')
+        cell_selection.focus()
     } else if (event.key === 'ArrowLeft' && selection.x > 0) {
         // move left
-        cell_selection.setAttribute('selected', 'false')
         cell_selection = UI.cells[selection.y][selection.x - 1]
-        cell_selection.setAttribute('selected', 'true')
+        cell_selection.focus()
     } else if (event.key === 'Backspace') {
         // delete textContent
-        cell_selection.textContent = ''
+        cell_selection.value = ''
 
         if (selection.x > 0) {
             // move left if not already leftmost
-            cell_selection.setAttribute('selected', 'false')
             cell_selection = UI.cells[selection.y][selection.x - 1]
-            cell_selection.setAttribute('selected', 'true')
+            cell_selection.focus()
         }
     } else if (event.key === 'Delete') {
         // delete textContent without moving
-        cell_selection.textContent = ''
-    } else if (ALPHABET.includes(event.key.toUpperCase()) && cell_selection && cell_selection.getAttribute('enabled') == 'true') {
+        cell_selection.value = ''
+    } else if (ALPHABET.includes(event.key.toUpperCase()) && cell_selection && cell_selection.disabled == false) {
         // change text
-        cell_selection.textContent = event.key.toUpperCase()
+        cell_selection.value = event.key.toUpperCase()
 
         // move to right cell if this one's not the last in row
         if (selection.x < word.length - 1) {
-            cell_selection.setAttribute('selected', 'false')
             cell_selection = UI.cells[selection.y][selection.x + 1]
-            cell_selection.setAttribute('selected', 'true')
+            cell_selection.focus()
         }
     } else if (event.key === 'Enter') submit_row()
 })
@@ -189,9 +187,9 @@ function submit_row() {
     // get string of current guess
     let guess = get_text(selection.y)
 
-    if (UI.cells[selection.y].filter(cell => cell.textContent.length > 0).length != UI.cells[selection.y].length) {
+    if (UI.cells[selection.y].filter(cell => cell.value === '').length > 0) {
         // show missing chars error
-        UI.cells[selection.y].filter(cell => cell.textContent === '').forEach(cell => {
+        UI.cells[selection.y].filter(cell => cell.value === '').forEach(cell => {
             cell.classList.add('error')
             setTimeout(() => cell.classList.remove('error'), 500)
         })
@@ -204,12 +202,11 @@ function submit_row() {
     } else {
         // valid guess
         // deselect cell
-        cell_selection.setAttribute('selected', 'false')
+        cell_selection.blur()
 
         // check if won
         if (guess === word) {
             // game won
-            cell_selection.setAttribute('selected', 'false')
             cell_selection = null
             gameover = true
 
@@ -219,7 +216,6 @@ function submit_row() {
             UI.message.className = 'won'
         } else if (selection.y == guesses - 1) {
             // game lost
-            cell_selection.setAttribute('selected', 'false')
             cell_selection = null
             gameover = true
 
@@ -229,10 +225,16 @@ function submit_row() {
             UI.message.className = 'lost'
         } else {
             // move to next row
-            UI.cells[selection.y].forEach(cell => cell.setAttribute('enabled', 'false'))
-            UI.cells[selection.y + 1].forEach(cell => cell.setAttribute('enabled', 'true'))
+            UI.cells[selection.y].forEach(cell => {
+                cell.setAttribute('enabled', false)
+                cell.disabled = true
+            })
+            UI.cells[selection.y + 1].forEach(cell => {
+                cell.setAttribute('enabled', true)
+                cell.disabled = false
+            })
             cell_selection = UI.cells[selection.y + 1][0]
-            cell_selection.setAttribute('selected', 'true')
+            cell_selection.focus()
         }
 
         // highlight previous row
@@ -298,7 +300,7 @@ function submit_row() {
 
 // get string from row
 function get_text(y) {
-    return UI.cells[y].reduce((a, b) => a + b.textContent, '')
+    return UI.cells[y].reduce((a, b) => a + b.value, '')
 }
 
 // return a random element from an array
