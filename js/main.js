@@ -293,7 +293,7 @@ function submit_row() {
         // highlight keyboard chars
         UI.cells[selection.y].forEach(cell =>
             document.querySelectorAll('keyboard char[value="-1"], keyboard char[value="0"], keyboard char[value="1"]').forEach(el_char => {
-                if (el_char.textContent === cell.textContent && ['-1', '0', '1'].includes(el_char.getAttribute('value'))) el_char.setAttribute('value', cell.getAttribute('value'))
+                if (el_char.textContent === cell.value && ['-1', '0', '1'].includes(el_char.getAttribute('value'))) el_char.setAttribute('value', cell.getAttribute('value'))
             })
         )
     }
