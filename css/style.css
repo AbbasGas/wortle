@@ -2,13 +2,15 @@
 @import url(variables.css);
 
 :root {
-	--cell-size: 1.2em;
+	--cell-size: 1.8em;
 	--col-lost: #f54;
 	--col-cell-empty: #fff;
 	--col-cell-incorrect: #999;
-	--col-cell-almost: #ff6;
-	--col-cell-correct: #6f9;
-	--colorblind-dot-size: 30%;
+	--col-cell-almost: hsl(41, 100%, 46%);
+	--col-cell-correct: hsl(140, 100%, 42%);
+	--radius: 12px;
+	--img-incorrect: url(../svg/incorrect.svg);
+	--img-almost: url(../svg/almost.svg);
 }
 
 body {
@@ -17,20 +19,17 @@ body {
 	font-size: 2em;
 	color: var(--col-text);
 	text-align: center;
-	padding: 1em 0;
+	padding: 0 0 1em 0;
 }
 
 h1 {
-	font-size: 1.5em;
-}
-
-h1,
-input {
+	font-size: 1em;
+	margin: 0.3em auto 0.3em auto;
 	font-family: serif;
 }
 
 main {
-	margin: 1em auto;
+	margin: 0 auto 0.5em auto;
 	display: flex;
 	flex-direction: column;
 }
@@ -50,8 +49,10 @@ input {
 	background-color: white;
 	margin: 0.1em;
 	box-shadow: var(--shadow-1);
-	border: 2px solid var(--col-cell-empty);
-	opacity: 0.5;
+	border: 4px solid var(--col-cell-empty);
+	opacity: 0.7;
+	font-family: sans-serif;
+	border-radius: var(--radius);
 	transition: box-shadow var(--time-transition),
 		border-color var(--time-transition), opacity var(--time-transition);
 }
@@ -63,6 +64,10 @@ input[enabled='true'].error {
 input[enabled='true'] {
 	cursor: text;
 	opacity: 1;
+}
+
+input.loader {
+	opacity: 0;
 }
 
 input[enabled='true']:hover {
@@ -89,17 +94,24 @@ input[value='2'] {
 }
 
 btn {
-	margin-bottom: 2em;
-	font-size: 0.6em;
+	height: 1em;
+	width: 1em;
+	font-size: 1em;
 	display: inline-block;
-	padding: 0.4em 1em;
+	padding: 0.4em;
 	background-color: var(--col-primary);
 	color: white;
 	box-shadow: var(--shadow-1);
 	border: none;
 	cursor: pointer;
-	transition: box-shadow 0.3s, background-color 0.3s;
+	transition: box-shadow 0.3s, background-color 0.3s, transform 0.3s;
 	user-select: none;
+	font-family: sans-serif;
+	border-radius: var(--radius);
+}
+
+btn:active {
+	transform: scale(0.95);
 }
 
 btn:hover {
@@ -124,6 +136,7 @@ char {
 	display: inline-block;
 	width: 1em;
 	height: 1em;
+	color: var(--col-bg);
 	background: var(--col-cell-empty);
 	padding: 0.1em;
 	margin: 0.2em;
@@ -131,37 +144,28 @@ char {
 	font-weight: 900;
 }
 
-char[value='0'] {
-	background-color: var(--col-cell-incorrect);
-}
-
-char[value='1'] {
-	background-color: var(--col-cell-almost);
-}
-
-char[value='2'] {
-	background-color: var(--col-cell-correct);
-}
-
-input[value='1'],
-input[value='2'],
-char[value='1'],
-char[value='2'] {
-	background-image: url(../svg/circle.svg);
-	background-size: var(--colorblind-dot-size);
+char,
+input {
+	background-position: top left;
+	background-size: contain;
 	background-repeat: no-repeat;
 }
 
-input[value='1'],
-char[value='1'] {
-	background-position: calc(100% + (var(--colorblind-dot-size) / 2))
-		calc(0% - (var(--colorblind-dot-size) / 2));
+char[value='0'],
+input[value='0'] {
+	background-color: var(--col-cell-incorrect);
+	background-image: var(--img-incorrect);
 }
 
-input[value='2'],
-char[value='2'] {
-	background-position: calc(0% - (var(--colorblind-dot-size) / 2))
-		calc(0% - (var(--colorblind-dot-size) / 2));
+char[value='1'],
+input[value='1'] {
+	background-color: var(--col-cell-almost);
+	background-image: var(--img-almost);
+}
+
+char[value='2'],
+input[value='2'] {
+	background-color: var(--col-cell-correct);
 }
 
 message {
@@ -221,7 +225,7 @@ legend {
 	box-sizing: border-box;
 	margin: auto;
 	padding: 0.1em 1em;
-	margin-top: 0em;
+	margin-top: 0.5em;
 	width: auto;
 }
 

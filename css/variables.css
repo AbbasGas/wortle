@@ -1,9 +1,9 @@
 :root {
-	--col-bg: hsl(15, 12%, 90%);
-	--col-text: hsla(20, 60%, 5%, 0.87);
+	--col-bg: hsl(240, 20%, 8%);
+	--col-text: hsla(15, 12%, 90%, 0.87);
 	--col-text-light: white;
-	--col-primary: cadetblue;
-	--col-primary-light: hsl(182, 35%, 60%);
+	--col-primary: hsl(180, 80%, 40%);
+	--col-primary-light: hsl(180, 80%, 50%);
 	--col-accent: hsl(303, 28%, 31%);
 
 	--shadow-1: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);

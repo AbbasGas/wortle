@@ -23,7 +23,7 @@ const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 // determines how many tries per word relative to word length
 // e.g. with a 5 letter word, AMOUNT_TRIES = 2 would mean 10 tries
-const AMOUNT_TRIES = 1.5
+const AMOUNT_TRIES = 1.2
 
 // lexicon of german words
 let lexicon
@@ -100,6 +100,10 @@ function reset(given_word) {
             cell.setAttribute('y', y)
             cell.disabled = true
             cell.setAttribute('enabled', false)
+            cell.className = 'loader'
+            setTimeout(() => {
+                cell.classList.remove('loader')
+            }, x * y * 20)
 
             // add eventlistener
             cell.addEventListener('click', c => {
@@ -134,7 +138,12 @@ function reset(given_word) {
 
 // handle arrow and alphabetic keys
 document.addEventListener('keydown', event => {
-    if (gameover) return
+    // only act if key was pressed in input element
+    let on_input = [...document.querySelectorAll('input')].includes(event.target)
+    if (!on_input || gameover) return
+
+    // prevent default behaviour
+    event.preventDefault()
 
     // current cell selection x and y coordinates
     let selection = {
@@ -175,7 +184,6 @@ document.addEventListener('keydown', event => {
             cell_selection.focus()
         }
     } else if (event.key === 'Enter') submit_row()
-    else if (event.key.match(/[a-zA-Z0-9_]*/)) event.preventDefault()
 })
 
 // submit the guess
