@@ -175,6 +175,7 @@ document.addEventListener('keydown', event => {
             cell_selection.focus()
         }
     } else if (event.key === 'Enter') submit_row()
+    else if (event.key.match(/[a-zA-Z0-9_]*/)) event.preventDefault()
 })
 
 // submit the guess
