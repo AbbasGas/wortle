@@ -21,9 +21,11 @@ const UI = {
 // alphabet for letter parsing
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-// determines how many tries per word relative to word length
-// e.g. with a 5 letter word, AMOUNT_TRIES = 2 would mean 10 tries
-const AMOUNT_TRIES = 1.2
+// how long the solution words are
+const WORD_LENGTH = 5
+
+// how many guesses per solution
+const AMOUNT_TRIES = 5
 
 // lexicon of german words (for guessing words)
 let lexicon
@@ -33,9 +35,6 @@ let wordlist
 
 // current solution
 let word
-
-// amount of guesses (gets determined by guesses * word.length)
-let guesses
 
 // currently selected cell for typing
 let cell_selection
@@ -62,38 +61,14 @@ async function setup() {
         UI.keyboard.append(el_char)
     })
 
-    // start
-    reset()
-}
-
-// reset the round
-function reset(given_word) {
-    // reset game state
-    gameover = false
-
-    // pick random word
-    word = given_word?.toUpperCase() || wordlist.random()
-
-    // set status message
-    UI.message_text.textContent = ''
-    UI.message_solution.textContent = ''
-    UI.message.className = ''
-
-    // set amount of guesses based on word length
-    guesses = Math.ceil(word.length * AMOUNT_TRIES)
-
-    // clear grid
-    UI.cells.forEach(row => row.forEach(cell => cell.remove()))
-    UI.cells = []
-
     // create rows and cells
-    for (let y = 0; y < guesses; y++) {
+    for (let y = 0; y < AMOUNT_TRIES; y++) {
         // create new row
         let row = document.createElement('row')
         row.setAttribute('y', y)
         UI.cells.push([])
 
-        for (let x = 0; x < word.length; x++) {
+        for (let x = 0; x < WORD_LENGTH; x++) {
             // create new cell
             let cell = document.createElement('input')
             cell.setAttribute('x', x)
@@ -113,6 +88,52 @@ function reset(given_word) {
                 cell_selection = cell
             })
 
+            // handle key input
+            cell.addEventListener('keydown', event => {
+                // prevent default input
+                event.preventDefault()
+
+                // current cell selection x and y coordinates
+                let selection = {
+                    x: parseInt(cell_selection.getAttribute('x')),
+                    y: parseInt(cell_selection.getAttribute('y'))
+                }
+
+                // decide action based on key 
+                if (['ArrowRight', 'Tab'].includes(event.key) && selection.x < word.length - 1) {
+                    // move right
+                    cell_selection = UI.cells[selection.y][selection.x + 1]
+                    cell_selection.focus()
+                } else if (event.key === 'ArrowLeft' && selection.x > 0) {
+                    // move left
+                    cell_selection = UI.cells[selection.y][selection.x - 1]
+                    cell_selection.focus()
+                } else if (event.key === 'Backspace') {
+                    // delete letter
+                    cell_selection.value = ''
+
+                    // move left if not already leftmost
+                    if (selection.x > 0) {
+                        cell_selection = UI.cells[selection.y][selection.x - 1]
+                        cell_selection.focus()
+                    }
+                } else if (event.key === 'Delete') {
+                    // delete textContent without moving
+                    cell_selection.value = ''
+                } else if (ALPHABET.includes(event.key.toUpperCase()) && cell_selection && cell_selection.disabled == false) {
+                    event.preventDefault()
+
+                    // change text
+                    cell_selection.value = event.key.toUpperCase()
+
+                    // move to right cell if this one's not the last in row
+                    if (selection.x < word.length - 1) {
+                        cell_selection = UI.cells[selection.y][selection.x + 1]
+                        cell_selection.focus()
+                    }
+                } else if (event.key === 'Enter') submit_row()
+            })
+
             // append to row
             row.append(cell)
             UI.cells[y].push(cell)
@@ -121,6 +142,33 @@ function reset(given_word) {
         // append to body
         UI.main.append(row)
     }
+
+    // start
+    reset()
+}
+
+// reset the round
+function reset(given_word) {
+    // reset game state
+    gameover = false
+
+    // pick random word
+    word = given_word?.toUpperCase() || wordlist.random()
+
+    // set status message
+    UI.message_text.textContent = ''
+    UI.message_solution.textContent = ''
+    UI.message.className = ''
+
+    // clear cells
+    UI.cells.forEach(row => {
+        row.forEach(cell => {
+            cell.setAttribute('state', '')
+            cell.value = ''
+            cell.className = ''
+            cell.setAttribute('enabled', false)
+        })
+    })
 
     // enable input on first row
     UI.cells[0].forEach(row => {
@@ -133,58 +181,8 @@ function reset(given_word) {
     UI.cells[0][0].focus()
 
     // reset character preview
-    document.querySelectorAll('keyboard char').forEach(char => char.setAttribute('value', '-1'))
+    document.querySelectorAll('keyboard char').forEach(char => char.setAttribute('state', '-1'))
 }
-
-// handle arrow and alphabetic keys
-document.addEventListener('keydown', event => {
-    // only act if key was pressed in input element
-    let on_input = [...document.querySelectorAll('input')].includes(event.target)
-    if (!on_input || gameover) return
-
-    // prevent default behaviour
-    event.preventDefault()
-
-    // current cell selection x and y coordinates
-    let selection = {
-        x: parseInt(cell_selection.getAttribute('x')),
-        y: parseInt(cell_selection.getAttribute('y'))
-    }
-
-    // decide action based on key 
-    if (['ArrowRight', 'Tab'].includes(event.key) && selection.x < word.length - 1) {
-        // move right
-        cell_selection = UI.cells[selection.y][selection.x + 1]
-        cell_selection.focus()
-    } else if (event.key === 'ArrowLeft' && selection.x > 0) {
-        // move left
-        cell_selection = UI.cells[selection.y][selection.x - 1]
-        cell_selection.focus()
-    } else if (event.key === 'Backspace') {
-        // delete textContent
-        cell_selection.value = ''
-
-        // move left if not already leftmost
-        if (selection.x > 0) {
-            cell_selection = UI.cells[selection.y][selection.x - 1]
-            cell_selection.focus()
-        }
-    } else if (event.key === 'Delete') {
-        // delete textContent without moving
-        cell_selection.value = ''
-    } else if (ALPHABET.includes(event.key.toUpperCase()) && cell_selection && cell_selection.disabled == false) {
-        event.preventDefault()
-
-        // change text
-        cell_selection.value = event.key.toUpperCase()
-
-        // move to right cell if this one's not the last in row
-        if (selection.x < word.length - 1) {
-            cell_selection = UI.cells[selection.y][selection.x + 1]
-            cell_selection.focus()
-        }
-    } else if (event.key === 'Enter') submit_row()
-})
 
 // submit the guess
 function submit_row() {
@@ -215,24 +213,30 @@ function submit_row() {
         cell_selection.blur()
 
         // check if won
-        if (guess === word) {
-            // game won
+        if (guess === word || selection.y == AMOUNT_TRIES - 1) {
+            // game over
             cell_selection = null
             gameover = true
 
-            // set status message
-            UI.message_text.textContent = UI.messages.won.main
-            UI.message_solution.textContent = UI.messages.won.span.replace('%i', selection.y + 1)
-            UI.message.className = 'won'
-        } else if (selection.y == guesses - 1) {
-            // game lost
-            cell_selection = null
-            gameover = true
+            // disable all cells
+            UI.cells.forEach(row => row.forEach(cell => {
+                cell.setAttribute('enabled', false)
+                cell.disabled = true
+            }))
+
+            // keep last guess highlighted
+            UI.cells[selection.y].forEach(cell => cell.classList.add('lastguess'))
 
             // set status message
-            UI.message_text.textContent = UI.messages.lost.main
-            UI.message_solution.textContent = UI.messages.lost.span.replace('%w', word)
-            UI.message.className = 'lost'
+            if (guess === word) {
+                UI.message_text.textContent = UI.messages.won.main
+                UI.message_solution.textContent = UI.messages.won.span.replace('%i', selection.y + 1)
+                UI.message.className = 'won'
+            } else {
+                UI.message_text.textContent = UI.messages.lost.main
+                UI.message_solution.textContent = UI.messages.lost.span.replace('%w', word)
+                UI.message.className = 'lost'
+            }
         } else {
             // disable current row
             UI.cells[selection.y].forEach(cell => {
@@ -259,7 +263,7 @@ function submit_row() {
 
         // first pass, mark all as invalid
         UI.cells[selection.y].forEach(cell => {
-            if (!cell.getAttribute('value')) cell.setAttribute('value', 0)
+            if (!cell.getAttribute('state')) cell.setAttribute('state', 0)
         })
 
         // second pass, mark correct letters
@@ -269,7 +273,7 @@ function submit_row() {
 
             if (char_guess == char_original) {
                 // char is correct
-                UI.cells[selection.y][i].setAttribute('value', '2')
+                UI.cells[selection.y][i].setAttribute('state', '2')
 
                 // flag char in word_checklist as taken (replace with -)
                 let index = word_checklist.split('').findIndex(char => char === char_guess)
@@ -291,7 +295,7 @@ function submit_row() {
             // if char left in word and char not already checked
             if (word_checklist.includes(char_guess) && char_guess != '-') {
                 // char in word, wrong position
-                UI.cells[selection.y][i].setAttribute('value', '1')
+                UI.cells[selection.y][i].setAttribute('state', '1')
 
                 // flag char in word_checklist as taken (replace with -)
                 let index = [...word_checklist].findIndex(char => char === char_guess)
@@ -303,8 +307,8 @@ function submit_row() {
 
         // highlight keyboard chars
         UI.cells[selection.y].forEach(cell =>
-            document.querySelectorAll('keyboard char[value="-1"], keyboard char[value="0"], keyboard char[value="1"]').forEach(el_char => {
-                if (el_char.textContent === cell.value && ['-1', '0', '1'].includes(el_char.getAttribute('value'))) el_char.setAttribute('value', cell.getAttribute('value'))
+            document.querySelectorAll('keyboard char[state="-1"], keyboard char[state="0"], keyboard char[state="1"]').forEach(el_char => {
+                if (el_char.textContent === cell.value && ['-1', '0', '1'].includes(el_char.getAttribute('state'))) el_char.setAttribute('state', cell.getAttribute('state'))
             })
         )
     }

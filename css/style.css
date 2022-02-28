@@ -1,5 +1,4 @@
 @import url(reset.css);
-@import url(variables.css);
 
 :root {
 	--cell-size: 1.8em;
@@ -11,6 +10,31 @@
 	--radius: 12px;
 	--img-incorrect: url(../svg/incorrect.svg);
 	--img-almost: url(../svg/almost.svg);
+
+	--col-bg: hsl(240, 20%, 8%);
+	--col-text: hsla(15, 12%, 90%, 0.95);
+	--col-text-light: white;
+	--col-primary: hsl(180, 80%, 40%);
+	--col-primary-light: hsl(180, 80%, 50%);
+	--col-accent: hsl(303, 28%, 31%);
+
+	--shadow-1: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
+	--shadow-2: 0 3px 6px rgba(0, 0, 0, 0.08), 0 3px 6px rgba(0, 0, 0, 0.12);
+	--shadow-3: 0 10px 20px rgba(0, 0, 0, 0.09), 0 6px 6px rgba(0, 0, 0, 0.12);
+	--shadow-4: 0 14px 28px rgba(0, 0, 0, 0.12), 0 10px 10px rgba(0, 0, 0, 0.12);
+	--shadow-5: 0 19px 38px rgba(0, 0, 0, 0.15), 0 15px 12px rgba(0, 0, 0, 0.12);
+
+	--shadow-card-1: rgba(255, 255, 255, 0) 0 0 40px 5px,
+		rgba(255, 255, 255, 0) 0 0 0 1px, 0 14px 28px rgba(0, 0, 0, 0.12),
+		0 10px 10px rgba(0, 0, 0, 0.12), inset #333 0 0 0 5px,
+		inset rgba(255, 255, 255, 0.5) 0 0 0 6px;
+	--shadow-card-2: rgba(255, 255, 255, 0.2) 0 0 40px 5px, white 0 0 0 1px,
+		0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.25),
+		inset #333 0 0 0 5px, inset white 0 0 0 6px;
+
+	--radius: 10px;
+
+	--time-transition: 0.4s;
 }
 
 body {
@@ -60,6 +84,10 @@ input[enabled='true'] {
 	opacity: 1;
 }
 
+input.lastguess {
+	opacity: 1;
+}
+
 input.loader {
 	opacity: 0;
 }
@@ -72,17 +100,17 @@ input:focus {
 	border-color: var(--col-primary);
 }
 
-input[value='0'] {
+input[state='0'] {
 	background-color: var(--col-cell-incorrect);
 	border-color: var(--col-cell-incorrect);
 }
 
-input[value='1'] {
+input[state='1'] {
 	background-color: var(--col-cell-almost);
 	border-color: var(--col-cell-almost);
 }
 
-input[value='2'] {
+input[state='2'] {
 	background-color: var(--col-cell-correct);
 	border-color: var(--col-cell-correct);
 }
@@ -145,20 +173,20 @@ input {
 	background-repeat: no-repeat;
 }
 
-char[value='0'],
-input[value='0'] {
+char[state='0'],
+input[state='0'] {
 	background-color: var(--col-cell-incorrect);
 	background-image: var(--img-incorrect);
 }
 
-char[value='1'],
-input[value='1'] {
+char[state='1'],
+input[state='1'] {
 	background-color: var(--col-cell-almost);
 	background-image: var(--img-almost);
 }
 
-char[value='2'],
-input[value='2'] {
+char[state='2'],
+input[state='2'] {
 	background-color: var(--col-cell-correct);
 }
 
