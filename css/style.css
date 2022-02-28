@@ -99,7 +99,8 @@ btn {
 	height: 1em;
 	width: 1em;
 	font-size: 1em;
-	display: inline-block;
+	display: block;
+	margin: auto;
 	padding: 0.4em;
 	background-color: var(--col-primary);
 	color: white;
