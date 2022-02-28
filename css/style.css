@@ -2,37 +2,22 @@
 
 :root {
 	--cell-size: 1.8em;
-	--col-lost: #f54;
+	--col-lost: hsl(5, 100%, 50%);
 	--col-cell-empty: #fff;
 	--col-cell-incorrect: #999;
-	--col-cell-almost: hsl(41, 100%, 46%);
-	--col-cell-correct: hsl(140, 100%, 42%);
-	--radius: 12px;
+	--col-cell-almost: hsl(41, 100%, 50%);
+	--col-cell-correct: hsl(140, 100%, 50%);
 	--img-incorrect: url(../svg/incorrect.svg);
 	--img-almost: url(../svg/almost.svg);
 
-	--col-bg: hsl(240, 20%, 8%);
+	--col-bg: hsl(240, 20%, 5%);
 	--col-text: hsla(15, 12%, 90%, 0.95);
-	--col-text-light: white;
-	--col-primary: hsl(180, 80%, 40%);
-	--col-primary-light: hsl(180, 80%, 50%);
+	--col-text-dark: hsla(15, 12%, 0%, 0.95);
+	--col-primary: hsl(210, 100%, 50%);
+	--col-primary-light: hsl(210, 100%, 70%);
 	--col-accent: hsl(303, 28%, 31%);
 
-	--shadow-1: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
-	--shadow-2: 0 3px 6px rgba(0, 0, 0, 0.08), 0 3px 6px rgba(0, 0, 0, 0.12);
-	--shadow-3: 0 10px 20px rgba(0, 0, 0, 0.09), 0 6px 6px rgba(0, 0, 0, 0.12);
-	--shadow-4: 0 14px 28px rgba(0, 0, 0, 0.12), 0 10px 10px rgba(0, 0, 0, 0.12);
-	--shadow-5: 0 19px 38px rgba(0, 0, 0, 0.15), 0 15px 12px rgba(0, 0, 0, 0.12);
-
-	--shadow-card-1: rgba(255, 255, 255, 0) 0 0 40px 5px,
-		rgba(255, 255, 255, 0) 0 0 0 1px, 0 14px 28px rgba(0, 0, 0, 0.12),
-		0 10px 10px rgba(0, 0, 0, 0.12), inset #333 0 0 0 5px,
-		inset rgba(255, 255, 255, 0.5) 0 0 0 6px;
-	--shadow-card-2: rgba(255, 255, 255, 0.2) 0 0 40px 5px, white 0 0 0 1px,
-		0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.25),
-		inset #333 0 0 0 5px, inset white 0 0 0 6px;
-
-	--radius: 10px;
+	--radius: 2px;
 
 	--time-transition: 0.4s;
 }
@@ -66,13 +51,12 @@ input {
 	line-height: var(--cell-size);
 	background-color: white;
 	margin: 0.1em;
-	box-shadow: var(--shadow-1);
 	border: 4px solid var(--col-cell-empty);
 	opacity: 0.7;
 	font-family: sans-serif;
 	border-radius: var(--radius);
-	transition: box-shadow var(--time-transition),
-		border-color var(--time-transition), opacity var(--time-transition);
+	transition: border-color var(--time-transition),
+		opacity var(--time-transition);
 }
 
 input[enabled='true'].error {
@@ -90,10 +74,6 @@ input.lastguess {
 
 input.loader {
 	opacity: 0;
-}
-
-input[enabled='true']:hover {
-	box-shadow: var(--shadow-2);
 }
 
 input:focus {
@@ -123,10 +103,9 @@ btn {
 	padding: 0.4em;
 	background-color: var(--col-primary);
 	color: white;
-	box-shadow: var(--shadow-1);
 	border: none;
 	cursor: pointer;
-	transition: box-shadow 0.3s, background-color 0.3s, transform 0.3s;
+	transition: background-color 0.3s, transform 0.3s;
 	user-select: none;
 	font-family: sans-serif;
 	border-radius: var(--radius);
@@ -138,7 +117,6 @@ btn:active {
 
 btn:hover {
 	background-color: var(--col-primary-light);
-	box-shadow: var(--shadow-2);
 }
 
 keyboard {
@@ -150,7 +128,6 @@ keyboard {
 	width: 50%;
 	min-width: 200px;
 	max-width: 400px;
-	box-shadow: var(--shadow-1);
 }
 
 char {
@@ -160,6 +137,7 @@ char {
 	height: 1em;
 	color: var(--col-bg);
 	background: var(--col-cell-empty);
+	border-radius: var(--radius);
 	padding: 0.1em;
 	margin: 0.2em;
 	user-select: none;
@@ -192,7 +170,7 @@ input[state='2'] {
 
 message {
 	user-select: none;
-	color: var(--col-text-light);
+	color: var(--col-text-dark);
 	font-weight: 400;
 	letter-spacing: 0.05em;
 	position: fixed;
@@ -206,7 +184,6 @@ message {
 	opacity: 0;
 	background-color: transparent;
 	transform: translateY(150%);
-	box-shadow: var(--shadow-2);
 	transition: opacity var(--time-transition),
 		background-color var(--time-transition),
 		transform var(--time-transition), color var(--time-transition);
@@ -229,7 +206,6 @@ message.lost {
 
 message.won {
 	background-color: var(--col-cell-correct);
-	color: var(--col-text);
 }
 
 message.lost {
@@ -253,6 +229,7 @@ legend {
 
 legend span {
 	font-size: 0.5em;
+	margin: 0 1em 0 0.5em;
 }
 
 legend > p {
