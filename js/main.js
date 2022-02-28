@@ -1,5 +1,5 @@
 // HTML elements
-let UI = {
+const UI = {
     main: document.querySelector('main'),
     keyboard: document.querySelector('keyboard'),
     message: document.querySelector('message'),
@@ -25,16 +25,16 @@ const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 // e.g. with a 5 letter word, AMOUNT_TRIES = 2 would mean 10 tries
 const AMOUNT_TRIES = 1.2
 
-// lexicon of german words
+// lexicon of german words (for guessing words)
 let lexicon
 
-// list of solutions/guessing words
+// list of solutions (for solution words)
 let wordlist
 
-// current word
+// current solution
 let word
 
-// amount of guesses (gets determined by wordlength)
+// amount of guesses (gets determined by guesses * word.length)
 let guesses
 
 // currently selected cell for typing
@@ -72,7 +72,7 @@ function reset(given_word) {
     gameover = false
 
     // pick random word
-    word = given_word?.toUpperCase() || random_word()
+    word = given_word?.toUpperCase() || wordlist.random()
 
     // set status message
     UI.message_text.textContent = ''
@@ -164,8 +164,8 @@ document.addEventListener('keydown', event => {
         // delete textContent
         cell_selection.value = ''
 
+        // move left if not already leftmost
         if (selection.x > 0) {
-            // move left if not already leftmost
             cell_selection = UI.cells[selection.y][selection.x - 1]
             cell_selection.focus()
         }
@@ -234,15 +234,17 @@ function submit_row() {
             UI.message_solution.textContent = UI.messages.lost.span.replace('%w', word)
             UI.message.className = 'lost'
         } else {
-            // move to next row
+            // disable current row
             UI.cells[selection.y].forEach(cell => {
                 cell.setAttribute('enabled', false)
                 cell.disabled = true
             })
+            // enable next row
             UI.cells[selection.y + 1].forEach(cell => {
                 cell.setAttribute('enabled', true)
                 cell.disabled = false
             })
+            // update cell selection
             cell_selection = UI.cells[selection.y + 1][0]
             cell_selection.focus()
         }
@@ -308,7 +310,7 @@ function submit_row() {
     }
 }
 
-// get string from row
+// get text from a row of input fields
 function get_text(y) {
     return UI.cells[y].reduce((a, b) => a + b.value, '')
 }
@@ -316,11 +318,6 @@ function get_text(y) {
 // return a random element from an array
 Array.prototype.random = function () {
     return this[Math.floor(Math.random() * this.length)]
-}
-
-// return a random word from the wordlist
-function random_word() {
-    return Object.values(wordlist).random().random()
 }
 
 // reset button
