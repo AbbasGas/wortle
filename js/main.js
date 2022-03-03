@@ -22,7 +22,7 @@ const UI = {
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 // how long the solution words are
-const WORD_LENGTH = 5
+const SOLUTION_LENGTH = 5
 
 // how many guesses per solution
 const AMOUNT_TRIES = 5
@@ -31,10 +31,10 @@ const AMOUNT_TRIES = 5
 let lexicon
 
 // list of solutions (for solution words)
-let wordlist
+let solutions
 
 // current solution
-let word
+let solution
 
 // currently selected cell for typing
 let cell_selection
@@ -45,13 +45,12 @@ let gameover
 // load words an start
 async function setup() {
     // load words
-    let words = await fetch('wordlist.json')
-    words = await words.json()
-    wordlist = words.words
+    solutions = await fetch('solutions.json')
+    solutions = await solutions.json()
 
     // load lexicon
-    let lex = await fetch('lexicon.json')
-    lexicon = await lex.json()
+    lexicon = await fetch('lexicon.json')
+    lexicon = await lexicon.json()
 
     // inject character preview
     ALPHABET.split('').forEach(char => {
@@ -68,7 +67,7 @@ async function setup() {
         row.setAttribute('y', y)
         UI.cells.push([])
 
-        for (let x = 0; x < WORD_LENGTH; x++) {
+        for (let x = 0; x < SOLUTION_LENGTH; x++) {
             // create new cell
             let cell = document.createElement('input')
             cell.setAttribute('x', x)
@@ -100,7 +99,7 @@ async function setup() {
                 }
 
                 // decide action based on key 
-                if (['ArrowRight', 'Tab'].includes(event.key) && selection.x < word.length - 1) {
+                if (['ArrowRight', 'Tab'].includes(event.key) && selection.x < SOLUTION_LENGTH - 1) {
                     // move right
                     cell_selection = UI.cells[selection.y][selection.x + 1]
                     cell_selection.focus()
@@ -127,7 +126,7 @@ async function setup() {
                     cell_selection.value = event.key.toUpperCase()
 
                     // move to right cell if this one's not the last in row
-                    if (selection.x < word.length - 1) {
+                    if (selection.x < SOLUTION_LENGTH - 1) {
                         cell_selection = UI.cells[selection.y][selection.x + 1]
                         cell_selection.focus()
                     }
@@ -148,12 +147,12 @@ async function setup() {
 }
 
 // reset the round
-function reset(given_word) {
+function reset(given_solution) {
     // reset game state
     gameover = false
 
     // pick random word
-    word = given_word?.toUpperCase() || wordlist.random()
+    solution = given_solution?.toUpperCase() || solutions.random()
 
     // set status message
     UI.message_text.textContent = ''
@@ -213,7 +212,7 @@ function submit_row() {
         cell_selection.blur()
 
         // check if won
-        if (guess === word || selection.y == AMOUNT_TRIES - 1) {
+        if (guess === solution || selection.y == AMOUNT_TRIES - 1) {
             // game over
             cell_selection = null
             gameover = true
@@ -228,13 +227,13 @@ function submit_row() {
             UI.cells[selection.y].forEach(cell => cell.classList.add('lastguess'))
 
             // set status message
-            if (guess === word) {
+            if (guess === solution) {
                 UI.message_text.textContent = UI.messages.won.main
                 UI.message_solution.textContent = UI.messages.won.span.replace('%i', selection.y + 1)
                 UI.message.className = 'won'
             } else {
                 UI.message_text.textContent = UI.messages.lost.main
-                UI.message_solution.textContent = UI.messages.lost.span.replace('%w', word)
+                UI.message_solution.textContent = UI.messages.lost.span.replace('%w', solution)
                 UI.message.className = 'lost'
             }
         } else {
@@ -254,12 +253,12 @@ function submit_row() {
         }
 
         // highlight previous row
-        // copy of the word to keep track of letters that have been flagged
-        // consider following scenario: word = "monkey", guess = "doodle"
+        // copy of the solution to keep track of letters that have been flagged
+        // consider following scenario: solution = "monkey", guess = "doodle"
         // the first letter o is valid, the second shouldn't be flagged as "wrong position"
         // since the o only appears once.
         // this trackkeeping helps with that, as every "taken" letter gets replaced by a "-" 
-        let word_checklist = word
+        let solution_checklist = solution
 
         // first pass, mark all as invalid
         UI.cells[selection.y].forEach(cell => {
@@ -267,19 +266,19 @@ function submit_row() {
         })
 
         // second pass, mark correct letters
-        for (let i = 0; i < word.length; i++) {
-            let char_original = word_checklist.charAt(i)
+        for (let i = 0; i < SOLUTION_LENGTH; i++) {
+            let char_original = solution_checklist.charAt(i)
             let char_guess = guess.charAt(i)
 
             if (char_guess == char_original) {
                 // char is correct
                 UI.cells[selection.y][i].setAttribute('state', '2')
 
-                // flag char in word_checklist as taken (replace with -)
-                let index = word_checklist.split('').findIndex(char => char === char_guess)
-                word_checklist = word_checklist.split('')
-                word_checklist[index] = '-'
-                word_checklist = word_checklist.join('')
+                // flag char in solution_checklist as taken (replace with -)
+                let index = solution_checklist.split('').findIndex(char => char === char_guess)
+                solution_checklist = solution_checklist.split('')
+                solution_checklist[index] = '-'
+                solution_checklist = solution_checklist.join('')
 
                 // flag char in guess as checked
                 guess = guess.split('')
@@ -289,19 +288,19 @@ function submit_row() {
         }
 
         // third pass, highlight all non-included
-        for (let i = 0; i < word.length; i++) {
+        for (let i = 0; i < SOLUTION_LENGTH; i++) {
             let char_guess = guess.charAt(i)
 
-            // if char left in word and char not already checked
-            if (word_checklist.includes(char_guess) && char_guess != '-') {
-                // char in word, wrong position
+            // if char left in solution and char not already checked
+            if (solution_checklist.includes(char_guess) && char_guess != '-') {
+                // char in solution, wrong position
                 UI.cells[selection.y][i].setAttribute('state', '1')
 
-                // flag char in word_checklist as taken (replace with -)
-                let index = [...word_checklist].findIndex(char => char === char_guess)
-                word_checklist = [...word_checklist]
-                word_checklist[index] = '-'
-                word_checklist = word_checklist.join('')
+                // flag char in solution_checklist as taken (replace with -)
+                let index = [...solution_checklist].findIndex(char => char === char_guess)
+                solution_checklist = [...solution_checklist]
+                solution_checklist[index] = '-'
+                solution_checklist = solution_checklist.join('')
             }
         }
 

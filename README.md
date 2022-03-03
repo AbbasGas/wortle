@@ -3,4 +3,4 @@ Ein deutscher Wordle-Klon.
 Das ist anders:
 - Farbenblindheit-freundlich
 - Deutsch
-- Nur Nomen
+- Nomen, Adjektive und Verben
