@@ -107,11 +107,8 @@ async function setup() {
                     // move left
                     cell_selection = UI.cells[selection.y][selection.x - 1]
                     cell_selection.focus()
-                } else if (event.key === 'Backspace') {
+                } else if (['Backspace', 'Delete'].includes(event.key)) {
                     // delete letter
-                    cell_selection.value = ''
-                } else if (event.key === 'Delete') {
-                    // delete textContent without moving
                     cell_selection.value = ''
                 } else if (ALPHABET.includes(event.key.toUpperCase()) && cell_selection && cell_selection.disabled == false) {
                     event.preventDefault()
