@@ -110,12 +110,6 @@ async function setup() {
                 } else if (event.key === 'Backspace') {
                     // delete letter
                     cell_selection.value = ''
-
-                    // move left if not already leftmost
-                    if (selection.x > 0) {
-                        cell_selection = UI.cells[selection.y][selection.x - 1]
-                        cell_selection.focus()
-                    }
                 } else if (event.key === 'Delete') {
                     // delete textContent without moving
                     cell_selection.value = ''
