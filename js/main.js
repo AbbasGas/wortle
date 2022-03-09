@@ -107,9 +107,19 @@ async function setup() {
                     // move left
                     cell_selection = UI.cells[selection.y][selection.x - 1]
                     cell_selection.focus()
-                } else if (['Backspace', 'Delete'].includes(event.key)) {
+                } else if (event.key === 'Delete') {
                     // delete letter
                     cell_selection.value = ''
+                } else if (event.key === 'Backspace') {
+                    if (cell_selection.value === '' && selection.x > 0) {
+                        // move left and delete letter
+                        cell_selection = UI.cells[selection.y][selection.x - 1]
+                        cell_selection.focus()
+                        cell_selection.textContent = ''
+                    } else {
+                        // delete letter
+                        cell_selection.value = ''
+                    }
                 } else if (ALPHABET.includes(event.key.toUpperCase()) && cell_selection && cell_selection.disabled == false) {
                     event.preventDefault()
 
