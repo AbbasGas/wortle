@@ -88,7 +88,7 @@ async function setup() {
             })
 
             // handle key input
-            cell.addEventListener('keydown', event => {
+            const handle_input = event => {
                 // prevent default input
                 event.preventDefault()
 
@@ -132,7 +132,10 @@ async function setup() {
                         cell_selection.focus()
                     }
                 } else if (event.key === 'Enter') submit_row()
-            })
+            }
+
+            cell.addEventListener('keydown', handle_input)
+            cell.addEventListener('input', handle_input)
 
             // append to row
             row.append(cell)
