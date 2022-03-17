@@ -134,8 +134,7 @@ async function setup() {
                 } else if (event.key === 'Enter') submit_row()
             }
 
-            cell.addEventListener('keydown', handle_input)
-            cell.addEventListener('input', handle_input)
+            ['keydown', 'input', 'change', 'paste'].forEach(eventname => cell.addEventListener(eventname, handle_input))
 
             // append to row
             row.append(cell)
